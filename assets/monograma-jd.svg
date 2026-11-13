@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="252 37 229 245">
+  <defs>
+    <linearGradient id="ouro" x2=".25" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#c9a952"/>
+      <stop offset=".65" stop-color="#ab8a44"/>
+      <stop offset="1" stop-color="#73603b"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#ouro)" stroke-width="8.5">
+    <path d="M271 49 L364 53 L365 198 C366 247 327 289 267 257"/>
+    <path d="M316 70 L321 265"/>
+    <path d="M375 56 C430 65 466 104 466 162 C468 225 436 264 368 265 L346 266"/>
+  </g>
+</svg>
