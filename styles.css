@@ -60,10 +60,14 @@
 .case-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: 22px;
 }
 .case-card {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   min-width: 0;
   overflow: hidden;
   background: #fffdf9;
