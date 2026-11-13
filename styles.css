@@ -501,3 +501,10 @@
   .mobile-drawer[open] { animation: drawer-in .26s ease-out; }
   @keyframes drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
 }
+
+@media (max-width: 650px) {
+  .ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ribbon i { display: none; }
+  .ribbon span { display: flex; align-items: center; gap: 8px; }
+  .ribbon span::before { content: "✧"; flex: none; color: var(--gold); font: italic 24px/1.4 var(--sans); }
+}
