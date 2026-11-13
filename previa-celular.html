@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prévia em iPhone · Dra. Jaqueline Dantas</title>
+<style>
+* { box-sizing: border-box }
+body { margin: 0; background: #ece9e1; color: #34392f; font: 15px system-ui,sans-serif }
+main { display: grid; justify-items: center; gap: 12px; padding: 12px }
+label { display: flex; align-items: center; gap: 10px }
+select { padding: 7px; color: inherit; background: #faf8f2; border: 1px solid #b6b5a9; border-radius: 6px }
+#area { position: relative }
+#phone { position: absolute; top: 0; left: 0; transform-origin: top left; padding: 12px; background: #242522; border: 2px solid #777870; border-radius: 46px; box-shadow: 0 9px 22px #32352930 }
+iframe { display: block; background: white; border: 0; border-radius: 32px }
+</style>
+</head>
+<body><main><label>Prévia em iPhone <select id="preset">
+<option value="390,844">iPhone 13 · 390 × 844</option>
+<option value="375,667">iPhone SE (3ª geração) · 375 × 667</option>
+<option value="430,932">iPhone 15 Pro Max · 430 × 932</option>
+</select></label><div id="area"><div id="phone"><iframe src="./index.html" title="Site da Dra. Jaqueline em tamanho de iPhone"></iframe></div></div></main>
+<script>
+const preset = document.querySelector('#preset');
+const phone = document.querySelector('#phone');
+const area = document.querySelector('#area');
+const screenFrame = document.querySelector('iframe');
+function resizePreview() {
+  const [width, height] = preset.value.split(',').map(Number);
+  screenFrame.style.width = width + 'px';
+  screenFrame.style.height = height + 'px';
+  const availableHeight = innerHeight - area.offsetTop - 16;
+  const scale = Math.min(1, (document.documentElement.clientWidth - 24) / phone.offsetWidth, Math.max(350, availableHeight) / phone.offsetHeight);
+  phone.style.transform = 'scale(' + scale + ')';
+  area.style.width = phone.offsetWidth * scale + 'px';
+  area.style.height = phone.offsetHeight * scale + 'px';
+}
+preset.addEventListener('change', resizePreview);
+window.addEventListener('resize', resizePreview);
+resizePreview();
+</script></body></html>
