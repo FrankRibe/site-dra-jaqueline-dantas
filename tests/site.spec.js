@@ -14,22 +14,23 @@ test.afterEach(async ({ page }) => {
   expect(page._siteErrors, 'JavaScript errors or missing requested resources').toEqual([]);
 });
 
-test('tratamentos fechados e seleção exclusiva de cor', async ({ page }) => {
+test('tratamentos fechados e seleção exclusiva de cor', async ({ page, isMobile }) => {
+  const activate = locator => isMobile ? locator.tap() : locator.click();
   const treatments = page.locator('.treatment-list details');
   await expect(treatments).toHaveCount(4);
   await expect(page.locator('.treatment-list details[open]')).toHaveCount(0);
   for (const index of [0, 1]) {
     const treatment = treatments.nth(index);
-    await treatment.locator('summary').click();
+    await activate(treatment.locator('summary'));
     await expect(page.locator('.treatment-list details[open]')).toHaveCount(1);
-    await treatment.getByRole('button', { name: 'BL1', exact: true }).click();
+    await activate(treatment.getByRole('button', { name: 'BL1', exact: true }));
     await expect(treatment.locator('[data-tone][aria-pressed="true"]')).toHaveText('BL1');
-    await treatment.getByRole('button', { name: 'A3', exact: true }).click();
+    await activate(treatment.getByRole('button', { name: 'A3', exact: true }));
     await expect(treatment.locator('[data-tone][aria-pressed="true"]')).toHaveText('A3');
-    await treatment.locator('[data-view="smile"]').click();
+    await activate(treatment.locator('[data-view="smile"]'));
     await expect(treatment.locator('.full-smile')).toBeVisible();
     await expect(treatment.locator('.smile-caption')).toContainText('A3');
-    await treatment.locator('summary').click();
+    await activate(treatment.locator('summary'));
   }
 });
 
