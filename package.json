@@ -1,0 +1,10 @@
+{
+  "name": "site-dra-jaqueline-dantas",
+  "private": true,
+  "scripts": {
+    "test": "npm run test:static && npm run test:e2e",
+    "test:static": "python3 tests/check_site.py",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": { "@playwright/test": "1.56.1" }
+}

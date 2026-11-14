@@ -512,3 +512,9 @@
   .ribbon span { display: flex; align-items: center; gap: 8px; }
   .ribbon span::before { content: "✧"; flex: none; color: var(--gold); font: italic 24px/1.4 var(--sans); }
 }
+
+/* Touch browsers must finish positioning controls before receiving a tap.
+   Global smooth scrolling can move a target during WebKit's focus/scroll cycle. */
+@media (hover: none) {
+  html { scroll-behavior: auto; }
+}

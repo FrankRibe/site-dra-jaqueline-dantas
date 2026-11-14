@@ -19,3 +19,19 @@ Abra `index.html` no navegador ou execute `python3 -m http.server 4173` nesta pa
 ## GitHub
 
 Repositório: https://github.com/FrankRibe/site-dra-jaqueline-dantas
+
+## Testes automáticos
+
+Requisitos: Node.js 22+ e Python 3. Na primeira execução:
+
+```sh
+npm ci --ignore-scripts
+npx playwright install chromium webkit
+npm test
+```
+
+`npm run test:static` verifica referências locais, âncoras, atributos alternativos das imagens e sintaxe dos scripts. `npm run test:e2e` verifica tratamentos, cores, galeria, contatos, menu mobile e largura da página em Chromium desktop e WebKit com viewport de iPhone. WebKit emulado não substitui a validação num iPhone real. Os testes usam um servidor próprio na porta 4180.
+
+O workflow `Site checks` roda em pull requests destinados a `hml` ou `main`, em pushes nessas branches e manualmente. Falhas geram relatório com capturas e trace por sete dias. Não há teste de disponibilidade dos serviços externos nem garantia de ausência de vulnerabilidades ou defeitos visuais.
+
+Para bloquear merges, configure `Site tests` como status check obrigatório nas regras de proteção de `hml` e `main`, com branch atualizada e PR obrigatório. O workflow sozinho não bloqueia deploys: os provedores atuais publicam quando as branches recebem commits. Mantenha os testes obrigatórios antes do merge e não permita bypass. Fluxo: branch de trabalho → PR para hml → validação → PR para main.
