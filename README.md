@@ -1,28 +1,36 @@
-# Dra. Jaqueline Dantas
+# Site da Dra. Jaqueline Dantas
 
-Primeira proposta visual de site institucional em HTML, CSS e JavaScript, responsiva, sem dependências de compilação.
+Site institucional responsivo em HTML, CSS e JavaScript. Apresenta a profissional, tratamentos, resultados, clínica e canais de contato. Não possui login, banco de dados ou agendamento interno.
 
-## Visualizar
+## Documentação
 
-Abra `index.html` no navegador ou execute `python3 -m http.server 4173` nesta pasta e acesse http://localhost:4173.
+Base revisada em 14/11/2026 a partir dos arquivos locais e das publicações verificadas nesta sessão.
 
-## Escopo
+- [Escopo e arquitetura](docs/arquitetura.md)
+- [Ambientes, publicação e recuperação](docs/operacao.md)
+- [Testes e critérios de aceite](docs/testes.md)
+- [Manutenção, segurança e pendências](docs/manutencao.md)
 
-- Apresentação, tratamentos, etapas de contato e perguntas frequentes.
-- Links para o Instagram e WhatsApp com mensagem pronta por tratamento.
-- O site não reserva horários. O atendimento confirma disponibilidade pelo WhatsApp.
-- Identificação e contatos transcritos do perfil público @drajaquelinedantas em 13/11/2026.
-- Direção visual proposta em marfim, oliva e dourado. A arte da abertura é uma composição abstrata em CSS, não uma foto do consultório.
-- Fotografias originais, endereço, horários e textos finais ainda precisam ser fornecidos ou validados pela profissional antes da publicação pública.
-- Fontes Google Fonts com alternativas locais de sistema.
+## Endereços
 
-## GitHub
+| Ambiente | Endereço |
+|---|---|
+| Desenvolvimento | http://localhost:4173/ |
+| Homologação | https://hml-dra-jaqueline-dantas.pages.dev/ |
+| Produção | https://frankribe.github.io/site-dra-jaqueline-dantas/ |
+| Repositório | https://github.com/FrankRibe/site-dra-jaqueline-dantas |
 
-Repositório: https://github.com/FrankRibe/site-dra-jaqueline-dantas
+## Executar
 
-## Testes automáticos
+Na pasta do projeto, com Python 3 instalado:
 
-Requisitos: Node.js 22+ e Python 3. Na primeira execução:
+```sh
+python3 -m http.server 4173 --bind 127.0.0.1
+```
+
+Abra http://localhost:4173/. Não é necessário compilar. Ctrl+C encerra o servidor.
+
+Para testes, instalar Node.js 22 e Python 3:
 
 ```sh
 npm ci --ignore-scripts
@@ -30,8 +38,4 @@ npx playwright install chromium webkit
 npm test
 ```
 
-`npm run test:static` verifica referências locais, âncoras, atributos alternativos das imagens e sintaxe dos scripts. `npm run test:e2e` verifica tratamentos, cores, galeria, contatos, menu mobile e largura da página em Chromium desktop e WebKit com viewport de iPhone. WebKit emulado não substitui a validação num iPhone real. Os testes usam um servidor próprio na porta 4180.
-
-O workflow `Site checks` roda em pull requests destinados a `hml` ou `main`, em pushes nessas branches e manualmente. Falhas geram relatório com capturas e trace por sete dias. Não há teste de disponibilidade dos serviços externos nem garantia de ausência de vulnerabilidades ou defeitos visuais.
-
-Para bloquear merges, configure `Site tests` como status check obrigatório nas regras de proteção de `hml` e `main`, com branch atualizada e PR obrigatório. O workflow sozinho não bloqueia deploys: os provedores atuais publicam quando as branches recebem commits. Mantenha os testes obrigatórios antes do merge e não permita bypass. Fluxo: branch de trabalho → PR para hml → validação → PR para main.
+No Linux, a instalação dos navegadores pode exigir `npx playwright install --with-deps chromium webkit`. Os testes usam a porta 4180.
