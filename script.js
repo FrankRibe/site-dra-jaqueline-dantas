@@ -22,7 +22,7 @@ drawer.addEventListener('click', event => {
 navigation.addEventListener('click', event => {
   if (drawer.open && event.target.closest('a')) closeMenu();
 });
-matchMedia('(max-width: 650px)').addEventListener('change', closeMenu);
+matchMedia('(max-width: 1100px)').addEventListener('change', closeMenu);
 document.querySelectorAll('[data-whatsapp], [data-treatment]').forEach(link => {
   const treatment = link.dataset.treatment;
   const message = treatment
