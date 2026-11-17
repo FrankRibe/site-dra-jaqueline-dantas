@@ -42,6 +42,14 @@ document.querySelector('#year').textContent = new Date().getFullYear();
 const filters = document.querySelector('.album-filters');
 const photos = [...document.querySelectorAll('.gallery-photo')];
 const results = photos.filter(item => item.dataset.category !== 'Clínica');
+const resultsGrid = document.querySelector('.results-grid');
+const resultPairs = [...resultsGrid.querySelectorAll('.result-pair')];
+const galleryMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const galleryAnimations = new Set();
+const revealedPairs = new WeakSet();
+let requestedCategory;
+let visibleCategory;
+let categoryChange = 0;
 const viewer = document.querySelector('#story-view');
 const photo = viewer.querySelector('.story-photo');
 let slides = [];
@@ -55,15 +63,72 @@ function alignIndicator() {
   filters.style.setProperty('--tab-width', active.offsetWidth + 'px');
 }
 
-function selectCategory(category) {
+function animateGallery(element, frames, options) {
+  const animation = element.animate(frames, options);
+  galleryAnimations.add(animation);
+  // Cancelled transitions are expected when someone selects another filter quickly.
+  return animation.finished.catch(() => {}).then(() => {
+    galleryAnimations.delete(animation);
+    animation.cancel();
+  });
+}
+
+function revealResult(element, index = 0) {
+  if (element.classList.contains('result-pair')) revealedPairs.add(element);
+  if (galleryMotion.matches || !element.animate) return Promise.resolve();
+  return animateGallery(element, [
+    { opacity: 0, transform: 'translateY(16px)' },
+    { opacity: 1, transform: 'translateY(0)' }
+  ], {
+    duration: 440, delay: Math.min(index, 3) * 65,
+    easing: 'cubic-bezier(.2,.75,.2,1)', fill: 'backwards'
+  });
+}
+
+function displayCategory(category) {
+  visibleCategory = category;
+  const selection = results.filter(item => item.dataset.category === category);
+  resultsGrid.style.setProperty('--columns', Math.min(4, selection.length));
+  for (const item of results) item.hidden = item.dataset.category !== category;
+  for (const pair of resultPairs) pair.hidden = pair.dataset.category !== category;
+}
+
+async function selectCategory(category) {
+  if (category === requestedCategory) return;
+  requestedCategory = category;
+  const change = ++categoryChange;
+  for (const animation of galleryAnimations) animation.cancel();
+  galleryAnimations.clear();
   for (const option of filters.children) {
     option.setAttribute('aria-pressed', String(option.textContent === category));
   }
-  const selection = results.filter(item => item.dataset.category === category);
-  document.querySelector('.results-grid').style.setProperty('--columns', Math.min(4, selection.length));
-  for (const item of results) item.hidden = item.dataset.category !== category;
   alignIndicator();
+  // The initial render and reduced-motion mode need no animated transition.
+  if (!visibleCategory || galleryMotion.matches || !resultsGrid.animate) {
+    displayCategory(category);
+    return;
+  }
+  await animateGallery(resultsGrid, [
+    { opacity: 1, transform: 'translateY(0)' },
+    { opacity: 0, transform: 'translateY(-8px)' }
+  ], { duration: 140, easing: 'ease-in', fill: 'forwards' });
+  if (change !== categoryChange) return;
+  displayCategory(category);
+  [...resultsGrid.children].filter(item => !item.hidden).forEach((item, index) => {
+    const rect = item.getBoundingClientRect();
+    // Offscreen comparisons keep their own entrance when reached by scrolling.
+    if (item.classList.contains('result-pair') && (rect.top >= innerHeight || rect.bottom <= 0)) return;
+    revealResult(item, index);
+  });
 }
+
+galleryMotion.addEventListener('change', () => {
+  if (!galleryMotion.matches) return;
+  ++categoryChange;
+  for (const animation of galleryAnimations) animation.cancel();
+  galleryAnimations.clear();
+  if (requestedCategory) displayCategory(requestedCategory);
+});
 
 for (const category of new Set(results.map(item => item.dataset.category))) {
   const button = document.createElement('button');
@@ -90,9 +155,10 @@ function showSlide(index) {
       { opacity: 1, transform: 'translateX(0)' }
     ], { duration: 310, easing: 'cubic-bezier(.2,.75,.2,1)' });
   }
-  photo.src = thumbnail.src;
+  photo.src = thumbnail.dataset.fullSrc || thumbnail.src;
   photo.alt = thumbnail.alt;
-  viewer.querySelector('strong').textContent = item.dataset.category;
+  viewer.querySelector('strong').textContent = item.dataset.case
+    ? `${item.dataset.caseTitle} · ${item.dataset.stage}` : item.dataset.category;
   viewer.querySelector('a').href = item.href;
   viewer.querySelector('[data-count]').textContent = (position + 1) + ' de ' + slides.length;
 }
@@ -103,7 +169,9 @@ for (const item of [...photos, ...casePhotos]) {
   item.addEventListener('click', event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey) return;
     event.preventDefault();
-    slides = casePhotos.includes(item) ? casePhotos : photos.filter(other => other.dataset.category === item.dataset.category);
+    slides = item.dataset.case
+      ? photos.filter(other => other.dataset.case === item.dataset.case)
+      : casePhotos.includes(item) ? casePhotos : photos.filter(other => other.dataset.category === item.dataset.category);
     viewer.querySelector('[data-original-label]').textContent = casePhotos.includes(item) ? 'Ver publicação completa no Instagram' : 'Ver destaque completo no Instagram';
     showSlide(slides.indexOf(item));
     viewer.showModal();
@@ -169,4 +237,56 @@ if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: re
     }
   }, { threshold: 0.15 });
   document.querySelectorAll('.section h2, .clinic-grid').forEach(element => entrances.observe(element));
+}
+
+// Parallax nas fotos; controles e rolagem permanecem nativos.
+(() => {
+  const frames = [...document.querySelectorAll('.hero-portrait, .clinic-grid > .gallery-photo')];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let request = 0;
+  function update() {
+    request = 0;
+    const mobile = innerWidth <= 700;
+    for (const frame of frames) {
+      const rect = frame.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > innerHeight) continue;
+      const progress = Math.max(-1, Math.min(1,
+        (innerHeight / 2 - rect.top - rect.height / 2) / ((innerHeight + rect.height) / 2)));
+      const hero = frame.classList.contains('hero-portrait');
+      const limit = mobile ? 18 : hero ? 65 : 38;
+      const distance = Math.min(limit, rect.height * (mobile ? 0.04 : 0.085));
+      frame.style.setProperty('--photo-offset', `${(progress * distance).toFixed(2)}px`);
+    }
+  }
+  function schedule() {
+    if (!reduced.matches && !document.hidden && !request) request = requestAnimationFrame(update);
+  }
+  function configure() {
+    cancelAnimationFrame(request);
+    request = 0;
+    frames.forEach(frame => {
+      frame.classList.toggle('photo-parallax', !reduced.matches);
+      frame.style.removeProperty('--photo-offset');
+    });
+    schedule();
+  }
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  document.addEventListener('load', schedule, true);
+  document.addEventListener('visibilitychange', schedule);
+  if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(document.body);
+  reduced.addEventListener('change', configure);
+  configure();
+})();
+
+// Entrada única, sem ocultar conteúdo quando JavaScript ou animações não estão disponíveis.
+if ('IntersectionObserver' in window) {
+  const comparisons = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      if (!revealedPairs.has(entry.target)) revealResult(entry.target);
+      comparisons.unobserve(entry.target);
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.result-pair').forEach(pair => comparisons.observe(pair));
 }

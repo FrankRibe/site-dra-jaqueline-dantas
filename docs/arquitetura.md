@@ -20,6 +20,12 @@ As visualizações são ilustrativas, não previsões individuais ou escalas fí
 
 Galerias usam arquivos locais e links das publicações de origem; não há sincronização automática com o Instagram. No celular, a navegação usa menu lateral.
 
+Em Resultados, Lentes reúne três comparativos com Antes e Depois identificados por caso. A ampliação navega apenas entre as etapas do mesmo caso; o antigo Caso 04 foi retirado por não corresponder ao mesmo paciente. Os comparativos têm largura limitada no computador, e Estética facial usa quatro colunas no desktop e duas no celular.
+
+As fotografias horizontais são apresentadas por arquivos SVG que incorporam os JPEGs originais, com rotação e enquadramento. Os arquivos originais permanecem em `assets/`. Nos dois retratos recortados de Lentes, `data-full-src` mantém a foto completa na ampliação; os três sorrisos de Casos clínicos usam a versão alinhada também ao ampliar.
+
+A troca de tratamento anima a saída e a entrada das fotos; os comparativos também aparecem ao entrar na tela. As fotos da abertura e da clínica têm parallax discreto. As animações respeitam a preferência de movimento reduzido.
+
 ## Componentes
 
 O provedor entrega arquivos estáticos; as interações ocorrem no navegador. Node.js e Playwright são ferramentas de teste, não requisitos de execução do site publicado.
@@ -47,7 +53,7 @@ Dependências externas: hospedagem GitHub Pages/Cloudflare Pages, Google Fonts e
 
 O CSS contém regras sucessivas: revisar a cascata antes de adicionar sobrescritas. Há foco visível e tratamento de movimento reduzido, sem auditoria completa de acessibilidade. Ícones SVG evitam variações de emoji entre plataformas.
 
-A regra `@media (hover: none)` desativa rolagem suave global em dispositivos de toque para evitar deslocamento de controles no WebKit. O CSS usa a versão de cache `touch-scroll-1` nesta revisão.
+A regra `@media (hover: none)` desativa rolagem suave global em dispositivos de toque para evitar deslocamento de controles no WebKit. CSS, `script.js` e `resina.js` usam a versão de cache `gallery-motion-12` nesta revisão.
 
 ## Fora do escopo
 
