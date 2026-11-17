@@ -113,7 +113,7 @@ const whiteningPhoto = document.querySelector('#whitening-photo');
 const whiteningButtons = document.querySelectorAll('[data-whitening]');
 for (const button of whiteningButtons) {
   button.onclick = () => {
-    whiteningPhoto.src = 'assets/galeria/' + button.dataset.whitening + '.jpg';
+    whiteningPhoto.src = 'assets/galeria/' + button.dataset.whitening + '-horizontal.svg';
     whiteningPhoto.alt = 'Registro de clareamento publicado pela Dra. Jaqueline, ' + button.textContent;
     for (const item of whiteningButtons) item.setAttribute('aria-pressed', String(item === button));
   };
